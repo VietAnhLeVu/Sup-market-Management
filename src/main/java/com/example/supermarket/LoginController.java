@@ -2,16 +2,17 @@ package com.example.supermarket;
 
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import java.net.URL;
-import java.util.ResourceBundle;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.sql.*;
 
-public class MarketController {
+public class LoginController {
 
     @FXML
     private Hyperlink employee_hyperlink;
@@ -52,6 +53,7 @@ public class MarketController {
 
     private PreparedStatement preparedStatement;
     public void adminLogin() {
+
         String adminData = "SELECT * FROM admin WHERE username = ? and password = ?";
 
         try {
@@ -59,31 +61,46 @@ public class MarketController {
 
             Alert alert;
 
-            if(admin_username.getText().isEmpty() || admin_password.getText().isEmpty()) {
+            if (admin_username.getText().isEmpty() || admin_password.getText().isEmpty()) {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error Message");
                 alert.setHeaderText(null);
                 alert.setContentText("Please fill all blank fields");
                 alert.showAndWait();
-            }
-
-            preparedStatement = connection.prepareStatement(adminData);
-            preparedStatement.setString(1,admin_username.getText());
-            preparedStatement.setString(2,admin_password.getText());
-            resultSet = preparedStatement.executeQuery();
-            if(resultSet.next()) {
-
             }else {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error Message");
-                alert.setHeaderText(null);
-                alert.setContentText("Wrong username/password");
-                alert.showAndWait();
+                preparedStatement = connection.prepareStatement(adminData);
+                preparedStatement.setString(1, admin_username.getText());
+                preparedStatement.setString(2, admin_password.getText());
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+
+                    // HIDE LOG IN FORM
+
+                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Information message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Successfully login!");
+                    alert.showAndWait();
+
+                    admin_loginBtn.getScene().getWindow().hide();
+
+
+                    Parent root = FXMLLoader.load(getClass().getResource("AdminDashboard.fxml"));
+                    Stage stage = new Stage();
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.show();
+                } else {
+                    alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error Message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Wrong username/password");
+                    alert.showAndWait();
+                }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
     public void switchForm(ActionEvent event) {
         if(event.getSource() == admin_hyperlink) {
