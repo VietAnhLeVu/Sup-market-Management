@@ -7,8 +7,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.sql.*;
 
@@ -52,6 +54,9 @@ public class LoginController {
     private ResultSet resultSet;
 
     private PreparedStatement preparedStatement;
+
+    private double x = 0;
+    private double y = 0;
     public void adminLogin() {
 
         String adminData = "SELECT * FROM admin WHERE username = ? and password = ?";
@@ -88,6 +93,18 @@ public class LoginController {
                     Parent root = FXMLLoader.load(getClass().getResource("AdminDashboard.fxml"));
                     Stage stage = new Stage();
                     Scene scene = new Scene(root);
+                    stage.initStyle(StageStyle.TRANSPARENT);
+                    root.setOnMousePressed((MouseEvent event) -> {
+                        x =event.getSceneX();
+                        y = event.getSceneY();
+                    });
+
+
+                    root.setOnMouseDragged((MouseEvent event) -> {
+                        stage.setX(event.getScreenX() - x);
+                        stage.setY(event.getScreenY() - y);
+                    });
+
                     stage.setScene(scene);
                     stage.show();
                 } else {

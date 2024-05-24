@@ -13,7 +13,14 @@
 .nav-form{
     -fx-background-color: #5078f2;
 }
-
+.dashboardBtn {
+    -fx-background-color: linear-gradient(to right, #5c4dcc,#3521cc);
+        -fx-cursor:hand;
+        -fx-font-family:"Arial";
+        -fx-text-fill:#fff;
+        -fx-font-size:14px;
+        -fx-alignment:CENTER-LEFT;
+}
 .nav-btn{
     -fx-background-color: transparent;
     -fx-cursor:hand;

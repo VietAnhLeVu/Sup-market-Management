@@ -5,6 +5,7 @@ module com.example.supermarket {
 
 
     requires org.controlsfx.controls;
+    requires fontawesomefx;
 
     opens com.example.supermarket to javafx.fxml;
     exports com.example.supermarket;
