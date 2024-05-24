@@ -1,0 +1,191 @@
+.top-form{
+    -fx-background-color:#fff;
+    -fx-border-color:#000;
+    -fx-border-width: 0px;
+}
+
+.main-form{
+    -fx-border-width: .2px 0px 0px 0px;
+    -fx-border-color:#000;
+    -fx-border-radius: 0px;
+}
+
+.nav-form{
+    -fx-background-color:linear-gradient(to top right, #64522c, #a8962b);
+    -fx-border-width: 0px;
+}
+
+.nav-btn{
+    -fx-background-color:linear-gradient(to bottom right, #896b34, #b8a536);
+    -fx-cursor:hand;
+    -fx-font-family:"Arial";
+    -fx-text-fill:#fff;
+    -fx-font-size:14px;
+    -fx-font-weight:bold;
+    -fx-alignment:CENTER;
+}
+
+.window-btn {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.window-btn:hover {
+    -fx-background-color: #dd2f4f;
+}
+
+.shadow{
+    -fx-effect:dropshadow(three-pass-box, rgba(0,0,0,0.4),5,0,0,0);
+}
+.white-bg{
+    -fx-background-color:#fff;
+    -fx-background-radius:5px;
+}
+
+.table-view{
+    -fx-background-color:transparent;
+    -fx-border-color:linear-gradient(to top right, #896b34, #b8a536);
+    -fx-border-width:2px;
+    -fx-border-radius:5px;
+    -fx-padding:0px;
+}
+
+.table-view .table-column{
+    -fx-alignment:CENTER;
+
+}
+
+.table-view .column-header-background{
+    -fx-background-color:linear-gradient(to top right, #896b34, #b8a536);
+    -fx-background-insets:0 0 0 0;
+    -fx-background-radius:5px 5px 0px 0px;
+}
+
+.table-view .column-header, .filter {
+    -fx-background-color:transparent;
+    -fx-size:50px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill:#fff;
+}
+
+.textfield{
+    -fx-background-color:transparent;
+    -fx-border-color:#896b34;
+    -fx-border-width:0px 0px .8px 0px;
+    -fx-font-family:"Tahoma";
+    -fx-font-size:13px;
+}
+
+.textfield:focused{
+    -fx-border-width:0px 0px 2px 0px;
+}
+
+.combobox{
+    -fx-background-color:transparent;
+    -fx-border-color:#896b34;
+    -fx-border-width:1px;
+    -fx-border-radius:5px;
+    -fx-font-family:"Tahoma";
+    -fx-font-size:13px;
+}
+
+.combobox:focused{
+    -fx-border-width:2px;
+}
+
+.spinner{
+    -fx-background-color:transparent;
+    -fx-border-color:#896b34;
+    -fx-border-width:1px;
+    -fx-border-radius:4px;
+    -fx-font-family:"Tahoma";
+    -fx-font-size:13px;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-body-color: #896b34;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    /* interpolate color between yellow and red based on first color brightness */
+    -fx-body-color: ladder(#444, #896b34 0%, red 100%);
+}
+
+.spinner .increment-arrow-button:hover:pressed,
+.spinner .decrement-arrow-button:hover:pressed,
+.spinner .increment-arrow-button:pressed,
+.spinner .decrement-arrow-button:pressed {
+    /* interpolate color between yellow and red based on first color brightness */
+    -fx-body-color: ladder(#AAA, #896b34 0%, red 100%);
+}
+
+.spinner .increment-arrow-button .increment-arrow {
+  /* The default Modena styling */
+  -fx-background-color: black, white;
+  -fx-background-insets: 0 0 -1 0, 0;
+  -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em;  /* 2 4 2 4 */
+  -fx-shape: "M 0 4 h 7 l -3.5 -4 z";
+}
+.spinner .decrement-arrow-button .decrement-arrow {
+  /* The default Modena styling */
+  -fx-background-color: black, white;
+  -fx-background-insets: 0 0 -1 0, 0;
+  -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
+  -fx-shape: "M 0 0 h 7 l -3.5 4 z";
+}
+
+.add-btn{
+    -fx-background-color:#275578;
+    -fx-background-radius:6px;
+    -fx-cursor:hand;
+    -fx-text-fill:#fff;
+    -fx-font-size:16px;
+    -fx-font-family:"Arial";
+}
+
+.add-btn:hover{
+    -fx-background-color:#2975ab;
+}
+
+.pay-btn{
+    -fx-background-color:#317584;
+    -fx-background-radius:8px;
+    -fx-cursor:hand;
+    -fx-text-fill:#fff;
+    -fx-font-size:16px;
+    -fx-font-family:"Arial";
+}
+
+.pay-btn:hover{
+    -fx-background-color:#33a2b8;
+}
+
+.receipt-btn{
+    -fx-background-color:#5e7230;
+    -fx-background-radius:8px;
+    -fx-cursor:hand;
+    -fx-text-fill:#fff;
+    -fx-font-size:16px;
+    -fx-font-family:"Arial";
+}
+
+.receipt-btn:hover{
+    -fx-background-color:#89ae32;
+}
+
+.clear-btn{
+    -fx-background-color:#7c3186;
+    -fx-background-radius:8px;
+    -fx-cursor:hand;
+    -fx-text-fill:#fff;
+    -fx-font-size:16px;
+    -fx-font-family:"Arial";
+}
+
+.clear-btn:hover{
+    -fx-background-color:#9328a4;
+}
