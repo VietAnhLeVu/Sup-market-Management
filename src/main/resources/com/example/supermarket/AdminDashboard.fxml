@@ -204,7 +204,7 @@
                                        </font>
                                     </Label>
                                     <Button fx:id="addProducts_addBtn" layoutX="36.0" layoutY="285.0" mnemonicParsing="false" onAction="#addProductsAdd" prefHeight="55.0" prefWidth="78.0" styleClass="add-btn" text="Add" />
-                                    <Button fx:id="addProducts_updateBtn" layoutX="149.0" layoutY="285.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="78.0" styleClass="update-btn" text="Update" />
+                                    <Button fx:id="addProducts_updateBtn" layoutX="149.0" layoutY="285.0" mnemonicParsing="false" onAction="#addProductsUpdate" prefHeight="55.0" prefWidth="78.0" styleClass="update-btn" text="Update" />
                                     <Button fx:id="addProducts_clearBtn" layoutX="36.0" layoutY="360.0" mnemonicParsing="false" onAction="#addProductsClear" prefHeight="55.0" prefWidth="78.0" styleClass="clear-btn" text="Clear" />
                                     <Button fx:id="addProducts_deleteBtn" layoutX="149.0" layoutY="360.0" mnemonicParsing="false" onAction="#addProductsDelete" prefHeight="55.0" prefWidth="78.0" styleClass="delete-btn" text="Delete" />
                                     <TextField fx:id="addProducts_price" layoutX="89.0" layoutY="179.0" prefHeight="31.0" prefWidth="157.0" styleClass="textfield" />
@@ -217,7 +217,7 @@
                                     <String fx:value="shadow" />
                                  </styleClass>
                                  <children>
-                                    <TextField fx:id="addProducts_search" layoutX="14.0" layoutY="14.0" prefHeight="23.0" prefWidth="243.0" promptText="Search" styleClass="search" />
+                                    <TextField fx:id="addProducts_search" layoutX="14.0" layoutY="14.0" onMouseClicked="#addProductsSearch" prefHeight="23.0" prefWidth="243.0" promptText="Search" styleClass="search" />
                                     <FontAwesomeIcon glyphName="SEARCH" layoutX="20.0" layoutY="31.0" size="1.2em" />
                                     <TableView fx:id="addProducts_tableView" layoutX="14.0" layoutY="73.0" onMouseClicked="#addProductsSelect" prefHeight="440.0" prefWidth="573.0">
                                       <columns>
@@ -232,7 +232,7 @@
                               </AnchorPane>
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="employees_form" prefHeight="555.0" prefWidth="901.0" stylesheets="@AdminDesign.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane fx:id="employees_form" prefHeight="555.0" prefWidth="901.0" stylesheets="@AdminDesign.css" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="529.0" prefWidth="874.0">
                                  <styleClass>
@@ -246,14 +246,14 @@
                                           <String fx:value="shadow" />
                                        </styleClass>
                                        <children>
-                                          <TableView fx:id="employees_tableView" layoutX="18.0" layoutY="25.0" prefHeight="255.0" prefWidth="839.0">
+                                          <TableView fx:id="employees_tableView" layoutX="18.0" layoutY="25.0" onMouseClicked="#employeesSelect" prefHeight="255.0" prefWidth="839.0">
                                             <columns>
                                               <TableColumn fx:id="employees_Employee_ID_col" prefWidth="109.0" text="Employee ID" />
                                               <TableColumn fx:id="employees_password_col" prefWidth="116.0" text="Password" />
                                                 <TableColumn fx:id="employees_first_name_col" prefWidth="132.0" text="First Name" />
                                                 <TableColumn fx:id="employees_last_name_col" prefWidth="105.0" text="Last Name" />
-                                                <TableColumn fx:id="employees_gender_col" prefWidth="89.0" text="Gender" />
-                                                <TableColumn fx:id="employees_DOM_col" prefWidth="286.0" text="Date of Membership" />
+                                                <TableColumn fx:id="employees_email_col" prefWidth="215.0" text="Email" />
+                                                <TableColumn fx:id="employees_jobTitle_col" prefWidth="160.0" text="Job Title" />
                                             </columns>
                                           </TableView>
                                        </children>
@@ -266,12 +266,14 @@
                                     <TextField fx:id="employees_Lastname" layoutX="449.0" layoutY="388.0" promptText="Last Name" styleClass="textfield" />
                                     <Label layoutX="372.0" layoutY="345.0" text="First Name:" />
                                     <TextField fx:id="employees_Firstname" layoutX="449.0" layoutY="340.0" promptText="First Name" styleClass="textfield" />
-                                    <Label layoutX="392.0" layoutY="438.0" text="Gender:" />
-                                    <ComboBox fx:id="employees_Gender" layoutX="449.0" layoutY="434.0" prefWidth="150.0" styleClass="combobox" />
-                                    <Button fx:id="employees_saveBtn" layoutX="775.0" layoutY="464.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="78.0" styleClass="add-btn" text="Save" />
-                                    <Button fx:id="employees_updateBtn" layoutX="682.0" layoutY="464.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="78.0" styleClass="update-btn" text="Update" />
-                                    <Button fx:id="employees_deleteBtn" layoutX="682.0" layoutY="414.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="78.0" styleClass="delete-btn" text="Delete" />
-                                    <Button fx:id="employees_clearBtn" layoutX="775.0" layoutY="414.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="78.0" styleClass="clear-btn" text="Clear" />
+                                    <Label layoutX="392.0" layoutY="438.0" text="Email:" />
+                                    <Button fx:id="employees_saveBtn" layoutX="775.0" layoutY="464.0" mnemonicParsing="false" onAction="#employeesSave" prefHeight="41.0" prefWidth="78.0" styleClass="add-btn" text="Save" />
+                                    <Button fx:id="employees_updateBtn" layoutX="682.0" layoutY="464.0" mnemonicParsing="false" onAction="#employeeUpdate" prefHeight="41.0" prefWidth="78.0" styleClass="update-btn" text="Update" />
+                                    <Button fx:id="employees_deleteBtn" layoutX="682.0" layoutY="414.0" mnemonicParsing="false" onAction="#employeesDelete" prefHeight="41.0" prefWidth="78.0" styleClass="delete-btn" text="Delete" />
+                                    <Button fx:id="employees_clearBtn" layoutX="775.0" layoutY="414.0" mnemonicParsing="false" onAction="#employeeReset" prefHeight="41.0" prefWidth="78.0" styleClass="clear-btn" text="Clear" />
+                                    <Label layoutX="88.0" layoutY="417.0" text="Job Title:" />
+                                    <TextField fx:id="employees_jobTitle" layoutX="158.0" layoutY="413.0" promptText="Job Title" styleClass="textfield" />
+                                    <TextField fx:id="employees_Email" layoutX="449.0" layoutY="435.0" promptText="Email" styleClass="textfield" />
                                  </children>
                               </AnchorPane>
                            </children>
