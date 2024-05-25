@@ -33,4 +33,17 @@ public class LoginModel {
             throw new RuntimeException(e);
         }
     }
+
+    public static String getEmployeeNameSQL(String username) {
+        try {
+            String employeeData = "SELECT lastName FROM employees WHERE employeeNumber = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(employeeData);
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            return resultSet.getString("lastName");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

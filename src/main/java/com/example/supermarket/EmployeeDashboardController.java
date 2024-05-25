@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -16,28 +17,21 @@ import static com.example.supermarket.EmployeeDashboardDataModel.*;
 public class EmployeeDashboardController {
 
     @FXML
+    Button logout;
+    @FXML
     private TableColumn<PurchaseData, Integer> col_customerId;
-
     @FXML
     private TableColumn<PurchaseData, String> col_brand;
-
     @FXML
     private TableColumn<PurchaseData, Double> col_price;
-
     @FXML
     private TableColumn<PurchaseData, String> col_productName;
-
     @FXML
     private TableColumn<PurchaseData, Integer> col_quantity;
-
     @FXML
     private Label employee_id;
-
     @FXML
     private Button minimizeButton;
-
-    @FXML Button logout;
-
     @FXML
     private Button purchase_addBtn;
 
@@ -75,7 +69,6 @@ public class EmployeeDashboardController {
 
     @FXML
     public void initialize() {
-        setEmployeeId();
         setDragAndDrop();
         setMinimize();
         setPurchaseListData();
@@ -85,9 +78,14 @@ public class EmployeeDashboardController {
         setPurchase_clearBtn();
     }
 
-    public void setEmployeeId() {
+    public void setEmployeeId(String employeeId) {
         //TODO: set employee id text.
-         employee_id.setText("USERNAME");
+        employee_id.setText(employeeId);
+        employee_id.setStyle("-fx-center:true");
+        employee_id.setMaxWidth(Double.MAX_VALUE);
+        AnchorPane.setLeftAnchor(employee_id, 0.0);
+        AnchorPane.setRightAnchor(employee_id, 0.0);
+        employee_id.setAlignment(Pos.CENTER);
     }
 
     public void setDragAndDrop() {
@@ -110,10 +108,10 @@ public class EmployeeDashboardController {
             AlertBox alertBox = new AlertBox(Alert.AlertType.CONFIRMATION, "Confirmation message", null, "Are you sure you want to logout?");
             Optional<ButtonType> option = alertBox.showAlert();
 
-            if(option.get().equals(ButtonType.OK)) {
+            if (option.get().equals(ButtonType.OK)) {
                 ((Stage) logout.getScene().getWindow()).setScene(
                         new Scene(FXMLLoader.load(getClass().getResource("LoginDashboard.fxml")
-                )));
+                        )));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,7 +130,7 @@ public class EmployeeDashboardController {
     }
 
     public void initPurchaseQuantitySpinner() {
-        purchase_quantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0,100,0));
+        purchase_quantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0));
         purchase_quantity.setEditable(true);
         purchase_quantity.getEditor().textProperty().addListener((Observable, oldValue, newValue) -> {
             if (oldValue.matches("0")) {
@@ -190,7 +188,7 @@ public class EmployeeDashboardController {
 
             //update total
             double currentTotal = Double.parseDouble(purchase_total.getText().substring(1));
-            purchase_total.setText("$" + String.valueOf(currentTotal + productPrice*purchase_quantity.getValue()));
+            purchase_total.setText("$" + (currentTotal + productPrice * purchase_quantity.getValue()));
 
             //update sql table
             insertPurchaseDataSQL(purchaseData);

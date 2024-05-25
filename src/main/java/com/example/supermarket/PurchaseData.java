@@ -1,6 +1,7 @@
 package com.example.supermarket;
 
-import javafx.beans.property.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.sql.Date;
 
@@ -16,71 +17,71 @@ public final class PurchaseData {
         return customerId.get();
     }
 
-    public ObjectProperty<Integer> customerIdProperty() {
-        return customerId;
-    }
-
     public void setCustomerId(int customerId) {
         this.customerId.set(customerId);
+    }
+
+    public ObjectProperty<Integer> customerIdProperty() {
+        return customerId;
     }
 
     public String getBrand() {
         return brand.get();
     }
 
-    public ObjectProperty<String> brandProperty() {
-        return brand;
-    }
-
     public void setBrand(String brand) {
         this.brand.set(brand);
+    }
+
+    public ObjectProperty<String> brandProperty() {
+        return brand;
     }
 
     public String getProductName() {
         return productName.get();
     }
 
-    public ObjectProperty<String> productNameProperty() {
-        return productName;
-    }
-
     public void setProductName(String productName) {
         this.productName.set(productName);
+    }
+
+    public ObjectProperty<String> productNameProperty() {
+        return productName;
     }
 
     public int getQuantity() {
         return quantity.get();
     }
 
-    public ObjectProperty<Integer> quantityProperty() {
-        return quantity;
-    }
-
     public void setQuantity(int quantity) {
         this.quantity.set(quantity);
+    }
+
+    public ObjectProperty<Integer> quantityProperty() {
+        return quantity;
     }
 
     public double getPrice() {
         return price.get();
     }
 
-    public ObjectProperty<Double> priceProperty() {
-        return price;
-    }
-
     public void setPrice(double price) {
         this.price.set(price);
+    }
+
+    public ObjectProperty<Double> priceProperty() {
+        return price;
     }
 
     public Date getDate() {
         return date.get();
     }
 
-    public ObjectProperty<Date> dateProperty() {
-        return date;
-    }
-
     public void setDate(Date date) {
         this.date.set(date);
+    }
+
+    public ObjectProperty<Date> dateProperty() {
+        return date;
     }
 }

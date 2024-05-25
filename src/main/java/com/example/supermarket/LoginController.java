@@ -6,50 +6,34 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.event.ActionEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.sql.*;
 
-import static com.example.supermarket.LoginModel.verifyAdminCredentialSQL;
-import static com.example.supermarket.LoginModel.verifyEmployeeCredentialSQL;
+import static com.example.supermarket.LoginModel.*;
 
 public class LoginController {
 
-    public enum FormType {
-        ADMIN, EMPLOYEE
-    }
-
     @FXML
     private AnchorPane colorPane;
-
     @FXML
     private TextField username;
-
     @FXML
     private AnchorPane main_form;
-
     @FXML
     private Label label;
-
     @FXML
     private PasswordField password;
-
     @FXML
     private Button loginBtn;
-
     @FXML
     private Hyperlink hyperlink;
-
     @FXML
     private StackPane window;
-
     private double x = 0;
     private double y = 0;
 
@@ -64,12 +48,12 @@ public class LoginController {
             window.setOnMouseReleased(releaseEvent -> window.getScene().getWindow().setOpacity(1));
         });
         username.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ENTER)){
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
                 login();
             }
         });
         password.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ENTER)){
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
                 login();
             }
         });
@@ -125,10 +109,13 @@ public class LoginController {
             AlertBox alertBox = new AlertBox(Alert.AlertType.INFORMATION, "Information message", null, "Successfully login!");
             alertBox.showAlert();
             try {
-            Stage stage = (Stage) window.getScene().getWindow();
-            Parent root = FXMLLoader.load(getClass().getResource("EmployeeDashboard.fxml"));
-            stage.setScene(new Scene(root));
-            stage.show();
+                Stage stage = (Stage) window.getScene().getWindow();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("EmployeeDashboard.fxml"));
+                Parent root = loader.load();
+                EmployeeDashboardController controller = loader.getController();
+                controller.setEmployeeId(getEmployeeNameSQL(username.getText()));
+                stage.setScene(new Scene(root));
+                stage.show();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -160,9 +147,9 @@ public class LoginController {
         System.exit(0);
     }
 
-
-
-
+    public enum FormType {
+        ADMIN, EMPLOYEE
+    }
 
 
 }
