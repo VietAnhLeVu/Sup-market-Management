@@ -1,5 +1,7 @@
 package com.example.supermarket;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -7,25 +9,26 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Optional;
+
+import static com.example.supermarket.EmployeeDashboardDataModel.*;
 
 public class EmployeeDashboardController {
 
     @FXML
-    private TableColumn<?, ?> col_brand;
+    private TableColumn<PurchaseData, Integer> col_customerId;
 
     @FXML
-    private TableColumn<?, ?> col_price;
+    private TableColumn<PurchaseData, String> col_brand;
 
     @FXML
-    private TableColumn<?, ?> col_productName;
+    private TableColumn<PurchaseData, Double> col_price;
 
     @FXML
-    private TableColumn<?, ?> col_quantity;
+    private TableColumn<PurchaseData, String> col_productName;
+
+    @FXML
+    private TableColumn<PurchaseData, Integer> col_quantity;
 
     @FXML
     private Label employee_id;
@@ -39,25 +42,28 @@ public class EmployeeDashboardController {
     private Button purchase_addBtn;
 
     @FXML
-    private Button purchase_addBtn1;
+    private Button purchase_clearBtn;
 
     @FXML
-    private TextField purchase_brand;
+    private TextField customerId;
+
+    @FXML
+    private ComboBox<String> purchase_brand;
 
     @FXML
     private Button purchase_payBtn;
 
     @FXML
-    private ComboBox<?> purchase_productName;
+    private ComboBox<String> purchase_productName;
 
     @FXML
-    private Spinner<?> purchase_quantity;
+    private Spinner<Integer> purchase_quantity;
 
     @FXML
     private Button purchase_receiptBtn;
 
     @FXML
-    private TableView<?> purchase_tableView;
+    private TableView<PurchaseData> purchase_tableView;
 
     @FXML
     private Label purchase_total;
@@ -65,14 +71,15 @@ public class EmployeeDashboardController {
     @FXML
     private AnchorPane titlePane;
 
-    public EmployeeDashboardController() {
-    }
-
     @FXML
     public void initialize() {
         setEmployeeId();
         setDragAndDrop();
         setMinimize();
+        setPurchaseListData();
+        initPurchaseBrand();
+        initPurchaseQuantitySpinner();
+        setPurchase_addBtn();
     }
 
     public void setEmployeeId() {
@@ -114,9 +121,77 @@ public class EmployeeDashboardController {
         }
     }
 
-    //Data part
-    private Connection connection;
-    private PreparedStatement preparedStatement;
-    private Statement statement;
-    private ResultSet resultSet;
+    public void setPurchaseListData() {
+        ObservableList<PurchaseData> purchaseList = loadPurchaseListDataSQL();
+        col_customerId.setCellValueFactory(item -> item.getValue().customerIdProperty());
+        col_brand.setCellValueFactory(item -> (item.getValue().brandProperty()));
+        col_productName.setCellValueFactory(item -> (item.getValue().productNameProperty()));
+        col_quantity.setCellValueFactory(item -> (item.getValue().quantityProperty()));
+        col_price.setCellValueFactory(item -> (item.getValue().priceProperty()));
+
+        purchase_tableView.setItems(purchaseList);
+    }
+
+    public void initPurchaseQuantitySpinner() {
+        purchase_quantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0,100,0));
+        purchase_quantity.setEditable(true);
+        purchase_quantity.getEditor().textProperty().addListener((Observable, oldValue, newValue) -> {
+            if (oldValue.matches("0")) {
+                purchase_quantity.getEditor().setText(newValue.replaceAll("0", ""));
+            }
+            if (!newValue.matches("\\d*")) {
+                purchase_quantity.getEditor().setText(newValue.replaceAll("\\D", ""));
+            }
+        });
+        purchase_quantity.valueProperty().addListener((Observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                purchase_quantity.getValueFactory().setValue(oldValue);
+            }
+        });
+    }
+
+    public void initPurchaseBrand() {
+        ObservableList<String> brandList = getBrandListSQL();
+        purchase_brand.setItems(brandList);
+        purchase_brand.valueProperty().addListener((Observable, oldValue, newValue) -> {
+            ObservableList<String> productList = searchBrandSQL(newValue);
+            purchase_productName.setItems(null);
+            purchase_productName.setItems(productList);
+        });
+    }
+
+    public void setPurchase_addBtn() {
+        purchase_addBtn.setOnAction(actionEvent -> {
+            //update purchase list and table
+            if (!verifyCustomerId()) {
+                alert(Alert.AlertType.ERROR, "Error message", null, "Customer ID must be integer");
+                return;
+            }
+
+            ObservableList<PurchaseData> purchaseList = FXCollections.observableArrayList();
+            PurchaseData purchaseData = new PurchaseData();
+            purchaseData.setCustomerId(Integer.parseInt(customerId.getText()));
+            purchaseData.setBrand(purchase_brand.getValue());
+            purchaseData.setProductName(purchase_productName.getValue());
+            purchaseData.setQuantity(purchase_quantity.getValue());
+            purchaseData.setPrice(getProductPriceSQL(purchase_productName.getValue()));
+
+            purchaseList.add(purchaseData);
+            purchase_tableView.setItems(purchaseList);
+            //update sql table
+            //update total
+        });
+    }
+
+    private void alert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private boolean verifyCustomerId() {
+        return customerId.getText().matches("\\d*") && !customerId.getText().isEmpty();
+    }
 }
