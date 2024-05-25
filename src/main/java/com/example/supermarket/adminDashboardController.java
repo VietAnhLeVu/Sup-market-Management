@@ -1,6 +1,10 @@
 package com.example.supermarket;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,12 +13,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -22,7 +31,7 @@ public class adminDashboardController implements Initializable {
 
 
     @FXML
-    private TableColumn<?, ?> addProducts_productID_col;
+    private TableColumn<productData, String> addProducts_productID_col;
 
     @FXML
     private TableColumn<?, ?> employees_gender_col;
@@ -55,16 +64,16 @@ public class adminDashboardController implements Initializable {
     private Label dashboard_todayIncome;
 
     @FXML
-    private TableColumn<?, ?> addProducts_brandName_col;
+    private TableColumn<productData, String> addProducts_brandName_col;
 
     @FXML
     private Button logout;
 
     @FXML
-    private TableView<?> addProducts_tableView;
+    private TableView<productData> addProducts_tableView;
 
     @FXML
-    private TableColumn<?, ?> addProducts_status_col;
+    private TableColumn<productData, Integer> addProducts_quantity_col;
 
     @FXML
     private TextField addProducts_brandName;
@@ -94,7 +103,7 @@ public class adminDashboardController implements Initializable {
     private TextField addProducts_price;
 
     @FXML
-    private TableColumn<?, ?> addProducts_productName_col;
+    private TableColumn<productData, String> addProducts_productName_col;
 
     @FXML
     private TextField addProducts_search;
@@ -112,7 +121,7 @@ public class adminDashboardController implements Initializable {
     private TableColumn<?, ?> employees_first_name_col;
 
     @FXML
-    private TableColumn<?, ?> addProducts_price_col;
+    private TableColumn<productData, Double> addProducts_price_col;
 
     @FXML
     private TableColumn<?, ?> employees_DOM_col;
@@ -124,7 +133,7 @@ public class adminDashboardController implements Initializable {
     private Button addProducts_addBtn;
 
     @FXML
-    private ComboBox<?> addProducts_status;
+    private TextField addProducts_quantity;
 
     @FXML
     private TextField addProducts_productName;
@@ -161,8 +170,274 @@ public class adminDashboardController implements Initializable {
 
     private double x = 0;
     private double y = 0;
+
+    private Connection connect;
+    private PreparedStatement prepare;
+    private Statement statement;
+    private ResultSet result;
+
+    public void addProductsAdd() {
+        String insertProduct = "INSERT INTO products " +
+                "(productCode,productLine,productName,quantityInStock,buyPrice) " +
+                "VALUES(?,?,?,?,?)";
+
+        connect = SQLconnect.connectTodb();
+        try {
+            Alert alert;
+
+            if (addProducts_productID.getText().isEmpty() ||
+                    addProducts_brandName.getText().isEmpty() ||
+                    addProducts_productName.getText().isEmpty() ||
+                    addProducts_quantity.getText().isEmpty() ||
+                    addProducts_price.getText().isEmpty()) {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Please fill all blank fields");
+                alert.showAndWait();
+            } else {
+                String check = "SELECT productCode FROM products" +
+                        " WHERE productCode ='" + addProducts_productID.getText() + "'";
+                statement = connect.createStatement();
+                result = statement.executeQuery(check);
+
+                if (result.next()) {
+                    alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error Message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Product ID: " + addProducts_productID.getText() + " was already existed!");
+                    alert.showAndWait();
+                } else {
+                    prepare = connect.prepareStatement(insertProduct);
+                    prepare.setString(1, addProducts_productID.getText());
+                    prepare.setString(2, addProducts_brandName.getText());
+                    prepare.setString(3, addProducts_productName.getText());
+                    prepare.setString(4, addProducts_quantity.getText());
+                    prepare.setString(5, addProducts_price.getText());
+                    prepare.executeUpdate();
+
+                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Information message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Suceesfully added!");
+                    alert.showAndWait();
+
+                    // UPDATE THE ADDED ROW
+                    addProductsShowData();
+
+                    // Clear infor once added
+                    addProductsClear();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addProductsUpdate() {
+        String updateProduct = "UPDATE products SET productLine = '" + addProducts_brandName.getText() + "'" +
+                ",SET productName = '" + addProducts_productName.getText() + "'" +
+                ",SET quantityInStock = '" + addProducts_quantity.getText() + "' " +
+                ",SET buyPrice = '" + addProducts_price.getText() + "' " +
+                "WHERE productCode == '" + addProducts_productID.getText() + "'";
+
+        connect = SQLconnect.connectTodb();
+
+        try {
+            Alert alert;
+
+            if (addProducts_productID.getText().isEmpty() ||
+                    addProducts_brandName.getText().isEmpty() ||
+                    addProducts_productName.getText().isEmpty() ||
+                    addProducts_quantity.getText().isEmpty() ||
+                    addProducts_price.getText().isEmpty()) {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Please fill all blank fields");
+                alert.showAndWait();
+            } else {
+                alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation message");
+                alert.setHeaderText(null);
+                alert.setContentText("Are you sure you wan to update Product ID : " +
+                        "'" + addProducts_productID.getText() + "'" + "?");
+                alert.showAndWait();
+
+                Optional<ButtonType> optional = alert.showAndWait();
+
+                if (optional.get().equals(ButtonType.OK)) {
+                    statement = connect.createStatement();
+                    statement.executeUpdate(updateProduct);
+
+                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Information message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Successfully updated!");
+                    alert.showAndWait();
+
+                    addProductsShowData();
+                    addProductsClear();
+                } else {
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addProductsClear() {
+        addProducts_productID.setText("");
+        addProducts_brandName.setText("");
+        addProducts_productName.setText("");
+        addProducts_quantity.setText("");
+        addProducts_price.setText("");
+    }
+
+    public void addProductsDelete() {
+        String deleteProduct = "DELETE FROM products WHERE productCode = '" + addProducts_productID.getText() + "'";
+
+        connect = SQLconnect.connectTodb();
+
+        try {
+            Alert alert;
+            if (addProducts_productID.getText().isEmpty() ||
+                    addProducts_brandName.getText().isEmpty() ||
+                    addProducts_productName.getText().isEmpty() ||
+                    addProducts_quantity.getText().isEmpty() ||
+                    addProducts_price.getText().isEmpty()) {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Please fill all blank fields");
+                alert.showAndWait();
+            } else {
+                alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation message");
+                alert.setHeaderText(null);
+                alert.setContentText("Are you sure want to DELETE Product ID : '" + addProducts_productID.getText() + "'");
+                Optional<ButtonType> optional = alert.showAndWait();
+                if (optional.get().equals(ButtonType.OK)) {
+                    prepare = connect.prepareStatement(deleteProduct);
+                    prepare.executeUpdate();
+
+                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Information message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Successfully deleted!");
+                    alert.showAndWait();
+
+                    addProductsClear();
+                    addProductsShowData();
+                } else {
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addProductsSearch() {
+
+
+        FilteredList<productData> filter = new FilteredList<>(addProductsList,e->true);
+
+        addProducts_search.textProperty().addListener((Observable, oldValue, newValue) -> {
+//            System.out.println("Search text changed to: " + newValue);
+
+            filter.setPredicate(predicateProductData -> {
+//                System.out.println("Evaluating product: " + predicateProductData.getProductID());
+
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String searchKey = newValue.toLowerCase();
+
+                if (predicateProductData.getProductID().toLowerCase().contains(searchKey)) {
+                    return true;
+                }else if(predicateProductData.getBrand().toLowerCase().contains(searchKey)) {
+                    return true;
+                }else if(predicateProductData.getProductName().toLowerCase().contains(searchKey)) {
+                    return true;
+                }else if(predicateProductData.getQuantity().toString().contains(searchKey)) {
+                    return true;
+                }else if(predicateProductData.getPrice().toString().contains(searchKey)) {
+                    return true;
+                }else {
+                    return false;
+                }
+            });
+        });
+
+
+
+        SortedList<productData> sortedList = new SortedList<>(filter);
+
+        sortedList.comparatorProperty().bind(addProducts_tableView.comparatorProperty());
+        addProducts_tableView.setItems(sortedList);
+
+
+    }
+
+    public void addProductsSelect() {
+        productData prod = addProducts_tableView.getSelectionModel().getSelectedItem();
+        int num = addProducts_tableView.getSelectionModel().getSelectedIndex();
+
+        if ((num - 1) < -1) {
+            return;
+        }
+
+        addProducts_productID.setText(prod.getProductID());
+        addProducts_brandName.setText(prod.getBrand());
+        addProducts_productName.setText(prod.getProductName());
+        addProducts_quantity.setText(String.valueOf(prod.getQuantity()));
+        addProducts_price.setText(String.valueOf(prod.getPrice()));
+    }
+
+    public ObservableList<productData> addProductsListData() {
+        ObservableList<productData> prodList = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM products";
+
+        connect = SQLconnect.connectTodb();
+        try {
+
+            productData prod;
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+                prod = new productData(result.getString("productCode"),
+                        result.getString("productLine"),
+                        result.getString("productName"),
+                        result.getInt("quantityInStock"),
+                        result.getDouble("buyPrice"));
+                prodList.add(prod);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return prodList;
+    }
+
+    private ObservableList<productData> addProductsList;
+
+    public void addProductsShowData() {
+        addProductsList = addProductsListData();
+
+        addProducts_productID_col.setCellValueFactory(new PropertyValueFactory<>("productID"));
+        addProducts_brandName_col.setCellValueFactory(new PropertyValueFactory<>("brand"));
+        addProducts_productName_col.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        addProducts_quantity_col.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        addProducts_price_col.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+        addProducts_tableView.setItems(addProductsList);
+    }
+
     public void logout() {
-        try{
+        try {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmation message");
             alert.setHeaderText(null);
@@ -170,20 +445,20 @@ public class adminDashboardController implements Initializable {
 
             Optional<ButtonType> option = alert.showAndWait();
 
-            if(option.get().equals(ButtonType.OK)) {
+            if (option.get().equals(ButtonType.OK)) {
 
                 logout.getScene().getWindow().hide();
 
                 Parent root = FXMLLoader.load(getClass().getResource("LoginDashboard.fxml"));
-                Stage stage= new Stage();
+                Stage stage = new Stage();
                 root.setOnMousePressed((MouseEvent event) -> {
                     x = event.getSceneX();
                     y = event.getSceneY();
                 });
 
                 root.setOnMouseDragged((MouseEvent event) -> {
-                    stage.setX(event.getScreenX()-x);
-                    stage.setY(event.getScreenY()-y);
+                    stage.setX(event.getScreenX() - x);
+                    stage.setY(event.getScreenY() - y);
 
                     stage.setOpacity(.8);
                 });
@@ -198,12 +473,14 @@ public class adminDashboardController implements Initializable {
                 stage.setScene(scene);
                 stage.show();
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
     public void switchForm(ActionEvent event) {
-        if(event.getSource() == dashboard_btn) {
+        if (event.getSource() == dashboard_btn) {
             dashboard_form.setVisible(true);
             addProducts_form.setVisible(false);
             employees_form.setVisible(false);
@@ -211,7 +488,7 @@ public class adminDashboardController implements Initializable {
             dashboard_btn.setStyle("-fx-background-color:linear-gradient(to right, #5c4dcc,#3521cc)");
             addProducts_btn.setStyle("-fx-background-color:transparent");
             employees_btn.setStyle("-fx-background-color:transparent");
-        }else if(event.getSource() == addProducts_btn) {
+        } else if (event.getSource() == addProducts_btn) {
             addProducts_form.setVisible(true);
             dashboard_form.setVisible(false);
             employees_form.setVisible(false);
@@ -219,7 +496,11 @@ public class adminDashboardController implements Initializable {
             addProducts_btn.setStyle("-fx-background-color:linear-gradient(to right, #5c4dcc,#3521cc)");
             dashboard_btn.setStyle("-fx-background-color:transparent");
             employees_btn.setStyle("-fx-background-color:transparent");
-        }else if(event.getSource() == employees_btn){
+
+            addProductsShowData();
+
+
+        } else if (event.getSource() == employees_btn) {
             employees_form.setVisible(true);
             dashboard_form.setVisible(false);
             addProducts_form.setVisible(false);
@@ -229,18 +510,21 @@ public class adminDashboardController implements Initializable {
             dashboard_btn.setStyle("-fx-background-color:transparent");
         }
     }
+
     public void close() {
         System.exit(0);
     }
 
     public void minimize() {
-        Stage stage = (Stage)main_form.getScene().getWindow();
+        Stage stage = (Stage) main_form.getScene().getWindow();
         stage.setIconified(true);
 
     }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        addProductsShowData();
+       addProductsSearch();
     }
 
 }
