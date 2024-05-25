@@ -71,7 +71,7 @@ public class EmployeeDashboardController {
     @FXML
     private AnchorPane titlePane;
 
-    private final ObservableList<PurchaseData> purchaseList = FXCollections.observableArrayList();
+    private ObservableList<PurchaseData> purchaseList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
@@ -107,12 +107,8 @@ public class EmployeeDashboardController {
 
     public void logout() {
         try {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation message");
-            alert.setHeaderText(null);
-            alert.setContentText("Are you sure you want to logout?");
-
-            Optional<ButtonType> option = alert.showAndWait();
+            AlertBox alertBox = new AlertBox(Alert.AlertType.CONFIRMATION, "Confirmation message", null, "Are you sure you want to logout?");
+            Optional<ButtonType> option = alertBox.showAlert();
 
             if(option.get().equals(ButtonType.OK)) {
                 ((Stage) logout.getScene().getWindow()).setScene(
@@ -125,7 +121,7 @@ public class EmployeeDashboardController {
     }
 
     public void setPurchaseListData() {
-        ObservableList<PurchaseData> purchaseList = loadPurchaseListDataSQL();
+        purchaseList = loadPurchaseListDataSQL();
         col_customerId.setCellValueFactory(item -> item.getValue().customerIdProperty());
         col_brand.setCellValueFactory(item -> (item.getValue().brandProperty()));
         col_productName.setCellValueFactory(item -> (item.getValue().productNameProperty()));
