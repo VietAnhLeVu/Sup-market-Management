@@ -70,10 +70,6 @@ public class EmployeeDashboardDataModel {
         return brandList;
     }
 
-    public static void addProductToPurchaseListSQL() {
-
-    }
-
     public static Double getProductPriceSQL(String productName) {
         String sql = "SELECT buyPrice FROM products WHERE productName = '" + productName + "';";
         try {

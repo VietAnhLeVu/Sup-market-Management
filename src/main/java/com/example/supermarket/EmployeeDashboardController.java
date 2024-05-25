@@ -76,6 +76,15 @@ public class EmployeeDashboardController {
         initPurchaseQuantitySpinner();
         setPurchase_addBtn();
         setPurchase_clearBtn();
+        setTotalValue();
+    }
+
+    private void setTotalValue() {
+        double totalAmount = 0;
+        for (PurchaseData purchaseData : purchaseList) {
+            totalAmount += purchaseData.getQuantity()*purchaseData.getPrice();
+        }
+        purchase_total.setText(String.valueOf(totalAmount));
     }
 
     public void setEmployeeId(String employeeId) {
