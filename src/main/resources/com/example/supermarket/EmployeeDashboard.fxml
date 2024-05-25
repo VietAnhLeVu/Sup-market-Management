@@ -15,7 +15,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.supermarket.EmployeeDashboard">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.supermarket.EmployeeDashboardController">
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
@@ -55,7 +55,7 @@
                               <Font name="Tahoma" size="17.0" />
                            </font>
                         </Label>
-                        <Label layoutX="39.0" layoutY="167.0" text="USERNAME" textFill="WHITE">
+                        <Label fx:id="employee_id" layoutX="39.0" layoutY="167.0" text="USERNAME" textFill="WHITE">
                            <font>
                               <Font name="Arial Bold" size="20.0" />
                            </font>
@@ -66,7 +66,7 @@
                               <FontAwesomeIcon fill="WHITE" glyphName="SHOPPING_CART" size="2em" />
                            </graphic>
                         </Button>
-                        <Button layoutX="13.0" layoutY="503.0" mnemonicParsing="false" styleClass="nav-btn" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0">
+                        <Button fx:id="logout" layoutX="13.0" layoutY="503.0" mnemonicParsing="false" onAction="#logout" styleClass="nav-btn" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0">
                            <graphic>
                               <FontAwesomeIcon fill="WHITE" glyphName="SIGN_OUT" size="2em" text="" />
                            </graphic>
@@ -85,10 +85,11 @@
                            <children>
                               <TableView fx:id="purchase_tableView" layoutX="13.0" layoutY="14.0" prefHeight="497.0" prefWidth="499.0">
                                 <columns>
-                                  <TableColumn fx:id="col_brand" minWidth="-Infinity" prefWidth="125.0" text="Brand Name" />
-                                  <TableColumn fx:id="col_productName" minWidth="-Infinity" prefWidth="125.0" text="Product Name" />
-                                    <TableColumn fx:id="col_quantity" minWidth="-Infinity" prefWidth="125.0" text="Quantity" />
-                                    <TableColumn fx:id="col_price" minWidth="-Infinity" prefWidth="125.0" text="Price" />
+                                    <TableColumn fx:id="col_customerId" minWidth="-Infinity" prefWidth="90.0" style="-fx-wrap-text: true;" text="Customer ID" />
+                                  <TableColumn fx:id="col_brand" minWidth="-Infinity" prefWidth="127.0" text="Brand Name" />
+                                  <TableColumn fx:id="col_productName" minWidth="-Infinity" prefWidth="127.0" text="Product Name" />
+                                    <TableColumn fx:id="col_quantity" minWidth="-Infinity" prefWidth="75.0" text="Quantity" />
+                                    <TableColumn fx:id="col_price" minWidth="-Infinity" prefWidth="75.0" text="Price" />
                                 </columns>
                               </TableView>
                            </children>
@@ -99,42 +100,48 @@
                               <String fx:value="shadow" />
                            </styleClass>
                            <children>
-                              <TextField fx:id="purchase_brand" layoutX="138.0" layoutY="58.0" prefHeight="30.0" prefWidth="176.0" styleClass="textfield">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </TextField>
-                              <Label layoutX="28.0" layoutY="63.0" text="Brand Name:">
+                              <Label layoutX="31.0" layoutY="85.0" text="Brand Name:">
                                  <font>
                                     <Font name="Tahoma" size="16.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="15.0" layoutY="110.0" text="Product Name:">
+                              <Label layoutX="17.0" layoutY="132.0" text="Product Name:">
                                  <font>
                                     <Font name="Tahoma" size="16.0" />
                                  </font>
                               </Label>
-                              <ComboBox fx:id="purchase_productName" layoutX="136.0" layoutY="105.0" prefHeight="30.0" prefWidth="179.0" promptText="Choose" styleClass="combobox" />
-                              <Label layoutX="55.0" layoutY="155.0" text="Quantity:">
+                              <ComboBox fx:id="purchase_productName" layoutX="138.0" layoutY="127.0" prefHeight="30.0" prefWidth="179.0" promptText="Choose" styleClass="combobox" />
+                              <Label layoutX="57.0" layoutY="177.0" text="Quantity:">
                                  <font>
                                     <Font name="Tahoma" size="16.0" />
                                  </font>
                               </Label>
-                              <Spinner fx:id="purchase_quantity" layoutX="136.0" layoutY="150.0" prefHeight="30.0" prefWidth="90.0" />
+                              <Spinner fx:id="purchase_quantity" layoutX="138.0" layoutY="172.0" prefHeight="30.0" prefWidth="90.0" />
                               <Button fx:id="purchase_addBtn" layoutX="180.0" layoutY="225.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="136.0" styleClass="add-btn" stylesheets="@EmployeeDesign.css" text="Add" />
-                              <Label layoutX="121.0" layoutY="327.0" text="Total:">
+                              <Label layoutX="114.0" layoutY="318.0" text="Total:">
                                  <font>
                                     <Font name="Tahoma" size="16.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="purchase_total" layoutX="172.0" layoutY="327.0" prefHeight="20.0" prefWidth="79.0" text="\$0.0">
+                              <Label fx:id="purchase_total" layoutX="181.0" layoutY="318.0" prefHeight="20.0" prefWidth="79.0" text="\$0.0">
                                  <font>
                                     <Font name="Tahoma" size="16.0" />
                                  </font>
                               </Label>
                               <Button fx:id="purchase_payBtn" layoutX="181.0" layoutY="384.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="136.0" styleClass="pay-btn" text="Pay" />
                               <Button fx:id="purchase_receiptBtn" layoutX="19.0" layoutY="384.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="136.0" styleClass="receipt-btn" text="Receipt" />
-                              <Button fx:id="purchase_addBtn1" layoutX="19.0" layoutY="225.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="136.0" styleClass="clear-btn" stylesheets="@EmployeeDesign.css" text="Clear" />
+                              <Button fx:id="purchase_clearBtn" layoutX="19.0" layoutY="225.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="136.0" styleClass="clear-btn" stylesheets="@EmployeeDesign.css" text="Clear" />
+                              <Label layoutX="30.0" layoutY="34.0" prefHeight="24.0" prefWidth="96.0" text="Customer ID:" textAlignment="CENTER" wrapText="true">
+                                 <font>
+                                    <Font name="Tahoma" size="16.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="customerId" layoutX="140.0" layoutY="31.0" prefHeight="30.0" prefWidth="176.0" styleClass="textfield">
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </TextField>
+                              <ComboBox fx:id="purchase_brand" layoutX="138.0" layoutY="80.0" prefHeight="30.0" prefWidth="179.0" promptText="Choose" styleClass="combobox" />
                            </children>
                         </AnchorPane>
                      </children>
