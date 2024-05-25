@@ -179,6 +179,25 @@ public class adminDashboardController implements Initializable {
     private Statement statement;
     private ResultSet result;
 
+
+    public void dashboardDisplayActiveEmployees() {
+        String sql = "SELECT COUNT(employeeNumber) from employees";
+
+        int countE = 0;
+
+        connect = SQLconnect.connectTodb();
+        try {
+            statement = connect.createStatement();
+            result = statement.executeQuery(sql);
+
+            if(result.next()) {
+                countE = result.getInt("COUNT(employeeNumber)");
+                dashboard_activeEmployees.setText(String.valueOf(countE));
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void addProductsAdd() {
         String insertProduct = "INSERT INTO products " +
                 "(productCode,productLine,productName,quantityInStock,buyPrice) " +
@@ -754,6 +773,8 @@ public class adminDashboardController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         addProductsShowData();
         employeesShowListData();
+
+        dashboardDisplayActiveEmployees();
     }
 
 }
