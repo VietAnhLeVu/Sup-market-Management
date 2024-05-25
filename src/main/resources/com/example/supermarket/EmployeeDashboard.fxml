@@ -15,7 +15,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.supermarket.EmployeeDashboard">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.supermarket.EmployeeDashboardController">
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
@@ -55,7 +55,7 @@
                               <Font name="Tahoma" size="17.0" />
                            </font>
                         </Label>
-                        <Label layoutX="39.0" layoutY="167.0" text="USERNAME" textFill="WHITE">
+                        <Label fx:id="employee_id" layoutX="39.0" layoutY="167.0" text="USERNAME" textFill="WHITE">
                            <font>
                               <Font name="Arial Bold" size="20.0" />
                            </font>
@@ -66,7 +66,7 @@
                               <FontAwesomeIcon fill="WHITE" glyphName="SHOPPING_CART" size="2em" />
                            </graphic>
                         </Button>
-                        <Button layoutX="13.0" layoutY="503.0" mnemonicParsing="false" styleClass="nav-btn" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0">
+                        <Button fx:id="logout" layoutX="13.0" layoutY="503.0" mnemonicParsing="false" onAction="#logout" styleClass="nav-btn" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0">
                            <graphic>
                               <FontAwesomeIcon fill="WHITE" glyphName="SIGN_OUT" size="2em" text="" />
                            </graphic>
@@ -122,12 +122,12 @@
                               </Label>
                               <Spinner fx:id="purchase_quantity" layoutX="136.0" layoutY="150.0" prefHeight="30.0" prefWidth="90.0" />
                               <Button fx:id="purchase_addBtn" layoutX="180.0" layoutY="225.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="136.0" styleClass="add-btn" stylesheets="@EmployeeDesign.css" text="Add" />
-                              <Label layoutX="121.0" layoutY="327.0" text="Total:">
+                              <Label layoutX="114.0" layoutY="318.0" text="Total:">
                                  <font>
                                     <Font name="Tahoma" size="16.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="purchase_total" layoutX="172.0" layoutY="327.0" prefHeight="20.0" prefWidth="79.0" text="\$0.0">
+                              <Label fx:id="purchase_total" layoutX="181.0" layoutY="318.0" prefHeight="20.0" prefWidth="79.0" text="\$0.0">
                                  <font>
                                     <Font name="Tahoma" size="16.0" />
                                  </font>
