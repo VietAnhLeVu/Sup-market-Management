@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class EmployeeDashboardDataModel {
     static Connection connection = SQLconnect.connectTodb();
@@ -12,7 +13,7 @@ public class EmployeeDashboardDataModel {
     public static ObservableList<PurchaseData> loadPurchaseListDataSQL() {
         ObservableList<PurchaseData> customerList = FXCollections.observableArrayList();
 
-        String sql = "SELECT * FROM orderData";
+        String sql = "SELECT * FROM purchaseData";
 
         try {
             PurchaseData orderdata;
@@ -80,6 +81,29 @@ public class EmployeeDashboardDataModel {
             resultSet.next();
             return resultSet.getDouble("buyPrice");
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void insertPurchaseDataSQL(PurchaseData purchaseData) {
+        String sql = "INSERT INTO purchaseData \n" +
+                "VALUES(" + purchaseData.getCustomerId() +
+                ", '" + purchaseData.getBrand() + "'" +
+                ", '" + purchaseData.getProductName() + "'" +
+                ", " + purchaseData.getQuantity() +
+                ", " + purchaseData.getPrice() +
+                ", '" + purchaseData.getDate() + "');";
+        try {
+            connection.prepareStatement(sql).executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void clearPurchaseDataSQL() {
+        try {
+            connection.createStatement().execute("DELETE FROM purchaseData;");
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
