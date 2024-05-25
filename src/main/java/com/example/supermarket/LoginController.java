@@ -7,128 +7,155 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.IOException;
 import java.sql.*;
+
+import static com.example.supermarket.LoginModel.verifyAdminCredentialSQL;
+import static com.example.supermarket.LoginModel.verifyEmployeeCredentialSQL;
 
 public class LoginController {
 
-    @FXML
-    private Hyperlink employee_hyperlink;
+    public enum FormType {
+        ADMIN, EMPLOYEE
+    }
 
     @FXML
-    private TextField admin_username;
+    private AnchorPane colorPane;
 
     @FXML
-    private Button employee_loginBtn;
-
-    @FXML
-    private PasswordField employee_password;
-
-    @FXML
-    private TextField employee_id;
+    private TextField username;
 
     @FXML
     private AnchorPane main_form;
 
     @FXML
-    private AnchorPane admin_form;
+    private Label label;
 
     @FXML
-    private AnchorPane employee_form;
+    private PasswordField password;
 
     @FXML
-    private Hyperlink admin_hyperlink;
+    private Button loginBtn;
 
     @FXML
-    private PasswordField admin_password;
+    private Hyperlink hyperlink;
 
     @FXML
-    private Button admin_loginBtn;
-
-    //Databases tool
-    private Connection connection;
-    private ResultSet resultSet;
-
-    private PreparedStatement preparedStatement;
+    private StackPane window;
 
     private double x = 0;
     private double y = 0;
-    public void adminLogin() {
 
-        String adminData = "SELECT * FROM admin WHERE username = ? and password = ?";
-
-        try {
-            connection = SQLconnect.connectTodb();
-
-            Alert alert;
-
-            if (admin_username.getText().isEmpty() || admin_password.getText().isEmpty()) {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error Message");
-                alert.setHeaderText(null);
-                alert.setContentText("Please fill all blank fields");
-                alert.showAndWait();
-            }else {
-                preparedStatement = connection.prepareStatement(adminData);
-                preparedStatement.setString(1, admin_username.getText());
-                preparedStatement.setString(2, admin_password.getText());
-                resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-
-                    // HIDE LOG IN FORM
-
-                    alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Information message");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Successfully login!");
-                    alert.showAndWait();
-
-                    admin_loginBtn.getScene().getWindow().hide();
-
-
-                    Parent root = FXMLLoader.load(getClass().getResource("AdminDashboard.fxml"));
-                    Stage stage = new Stage();
-                    Scene scene = new Scene(root);
-                    stage.initStyle(StageStyle.TRANSPARENT);
-                    root.setOnMousePressed((MouseEvent event) -> {
-                        x =event.getSceneX();
-                        y = event.getSceneY();
-                    });
-
-
-                    root.setOnMouseDragged((MouseEvent event) -> {
-                        stage.setX(event.getScreenX() - x);
-                        stage.setY(event.getScreenY() - y);
-                    });
-
-                    stage.setScene(scene);
-                    stage.show();
-                } else {
-                    alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error Message");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Wrong username/password");
-                    alert.showAndWait();
-                }
+    @FXML
+    public void initialize() {
+        window.setOnMousePressed(pressEvent -> {
+            window.setOnMouseDragged(dragEvent -> {
+                window.getScene().getWindow().setX(dragEvent.getScreenX() - pressEvent.getSceneX());
+                window.getScene().getWindow().setY(dragEvent.getScreenY() - pressEvent.getSceneY());
+                window.getScene().getWindow().setOpacity(0.8);
+            });
+            window.setOnMouseReleased(releaseEvent -> window.getScene().getWindow().setOpacity(1));
+        });
+        username.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)){
+                login();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        });
+        password.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)){
+                login();
+            }
+        });
+        loginBtn.setOnAction(actionEvent -> {
+            login();
+        });
+    }
+
+    public void login() {
+        if ((getCurrentForm() == FormType.ADMIN)) adminLogin();
+        else if (getCurrentForm() == FormType.EMPLOYEE) employeeLogin();
+    }
+
+    public void adminLogin() {
+        if (username.getText().isEmpty() || password.getText().isEmpty()) {
+            AlertBox alertBox = new AlertBox(Alert.AlertType.ERROR, "Error Message", null, "Please fill all blank fields");
+            alertBox.showAlert();
+        } else if (!verifyAdminCredentialSQL(username.getText(), password.getText())) {
+            AlertBox alertBox = new AlertBox(Alert.AlertType.ERROR, "Error Message", null, "Wrong username/password");
+            alertBox.showAlert();
+        } else {
+            AlertBox alertBox = new AlertBox(Alert.AlertType.INFORMATION, "Information message", null, "Successfully login!");
+            alertBox.showAlert();
+
+            Stage stage = (Stage) window.getScene().getWindow();
+            Parent root;
+            try {
+                root = FXMLLoader.load(getClass().getResource("AdminDashboard.fxml"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            stage.setScene(new Scene(root));
+            root.setOnMousePressed((MouseEvent event) -> {
+                x = event.getSceneX();
+                y = event.getSceneY();
+            });
+            root.setOnMouseDragged((MouseEvent event) -> {
+                stage.setX(event.getScreenX() - x);
+                stage.setY(event.getScreenY() - y);
+            });
+            stage.show();
         }
     }
-    public void switchForm(ActionEvent event) {
-        if(event.getSource() == admin_hyperlink) {
-            admin_form.setVisible(false);
-            employee_form.setVisible(true);
-        }else if(event.getSource() == employee_hyperlink)
-        {
-            admin_form.setVisible(true);
-            employee_form.setVisible(false);
+
+    public void employeeLogin() {
+        if (username.getText().isEmpty() || password.getText().isEmpty()) {
+            AlertBox alertBox = new AlertBox(Alert.AlertType.ERROR, "Error Message", null, "Please fill all blank fields");
+            alertBox.showAlert();
+        } else if (!verifyEmployeeCredentialSQL(username.getText(), password.getText())) {
+            AlertBox alertBox = new AlertBox(Alert.AlertType.ERROR, "Error Message", null, "Wrong username/password");
+            alertBox.showAlert();
+        } else {
+            AlertBox alertBox = new AlertBox(Alert.AlertType.INFORMATION, "Information message", null, "Successfully login!");
+            alertBox.showAlert();
+            try {
+            Stage stage = (Stage) window.getScene().getWindow();
+            Parent root = FXMLLoader.load(getClass().getResource("EmployeeDashboard.fxml"));
+            stage.setScene(new Scene(root));
+            stage.show();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
+
+    public void switchForm() {
+        if (getCurrentForm() == FormType.ADMIN) {
+            //admin -> employee
+            label.setText("EMPLOYEE SIGN IN");
+            label.setLayoutX(115);
+            colorPane.setStyle("-fx-background-color:linear-gradient(to top right, #64522c, #a8962b)");
+            hyperlink.setText("Login Admin Account");
+        } else if (getCurrentForm() == FormType.EMPLOYEE) {
+            //employee -> admin
+            label.setText("ADMIN SIGN IN");
+            label.setLayoutX(134);
+            colorPane.setStyle("-fx-background-color: #5078f2;");
+            hyperlink.setText("Login Employee Account");
+        }
+    }
+
+    //0: admin, 1: employee
+    public FormType getCurrentForm() {
+        return (label.getText().equals("ADMIN SIGN IN")) ? FormType.ADMIN : FormType.EMPLOYEE;
+    }
+
     public void close() {
         System.exit(0);
     }

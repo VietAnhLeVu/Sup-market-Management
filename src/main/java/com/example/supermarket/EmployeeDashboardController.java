@@ -71,6 +71,8 @@ public class EmployeeDashboardController {
     @FXML
     private AnchorPane titlePane;
 
+    private ObservableList<PurchaseData> purchaseList = FXCollections.observableArrayList();
+
     @FXML
     public void initialize() {
         setEmployeeId();
@@ -80,6 +82,7 @@ public class EmployeeDashboardController {
         initPurchaseBrand();
         initPurchaseQuantitySpinner();
         setPurchase_addBtn();
+        setPurchase_clearBtn();
     }
 
     public void setEmployeeId() {
@@ -104,12 +107,8 @@ public class EmployeeDashboardController {
 
     public void logout() {
         try {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation message");
-            alert.setHeaderText(null);
-            alert.setContentText("Are you sure you want to logout?");
-
-            Optional<ButtonType> option = alert.showAndWait();
+            AlertBox alertBox = new AlertBox(Alert.AlertType.CONFIRMATION, "Confirmation message", null, "Are you sure you want to logout?");
+            Optional<ButtonType> option = alertBox.showAlert();
 
             if(option.get().equals(ButtonType.OK)) {
                 ((Stage) logout.getScene().getWindow()).setScene(
@@ -122,7 +121,7 @@ public class EmployeeDashboardController {
     }
 
     public void setPurchaseListData() {
-        ObservableList<PurchaseData> purchaseList = loadPurchaseListDataSQL();
+        purchaseList = loadPurchaseListDataSQL();
         col_customerId.setCellValueFactory(item -> item.getValue().customerIdProperty());
         col_brand.setCellValueFactory(item -> (item.getValue().brandProperty()));
         col_productName.setCellValueFactory(item -> (item.getValue().productNameProperty()));
@@ -166,20 +165,35 @@ public class EmployeeDashboardController {
             if (!verifyCustomerId()) {
                 alert(Alert.AlertType.ERROR, "Error message", null, "Customer ID must be integer");
                 return;
+            } else if (purchase_brand.getValue() == null) {
+                alert(Alert.AlertType.ERROR, "Error message", null, "Brand Name must not be blank");
+                return;
+            } else if (purchase_productName.getValue() == null) {
+                alert(Alert.AlertType.ERROR, "Error message", null, "Product Name must not be blank");
+                return;
+            } else if (purchase_quantity.getValue() < 1) {
+                alert(Alert.AlertType.ERROR, "Error message", null, "Quantity must be >0");
+                return;
             }
 
-            ObservableList<PurchaseData> purchaseList = FXCollections.observableArrayList();
             PurchaseData purchaseData = new PurchaseData();
             purchaseData.setCustomerId(Integer.parseInt(customerId.getText()));
             purchaseData.setBrand(purchase_brand.getValue());
             purchaseData.setProductName(purchase_productName.getValue());
             purchaseData.setQuantity(purchase_quantity.getValue());
-            purchaseData.setPrice(getProductPriceSQL(purchase_productName.getValue()));
+            double productPrice = getProductPriceSQL(purchase_productName.getValue());
+            purchaseData.setPrice(productPrice);
+            purchaseData.setDate(new java.sql.Date(new java.util.Date().getTime()));
 
             purchaseList.add(purchaseData);
             purchase_tableView.setItems(purchaseList);
-            //update sql table
+
             //update total
+            double currentTotal = Double.parseDouble(purchase_total.getText().substring(1));
+            purchase_total.setText("$" + String.valueOf(currentTotal + productPrice*purchase_quantity.getValue()));
+
+            //update sql table
+            insertPurchaseDataSQL(purchaseData);
         });
     }
 
@@ -193,5 +207,14 @@ public class EmployeeDashboardController {
 
     private boolean verifyCustomerId() {
         return customerId.getText().matches("\\d*") && !customerId.getText().isEmpty();
+    }
+
+    public void setPurchase_clearBtn() {
+        purchase_clearBtn.setOnAction(actionEvent -> {
+            purchaseList.clear();
+            purchase_tableView.setItems(purchaseList);
+            purchase_total.setText("$0.0");
+            clearPurchaseDataSQL();
+        });
     }
 }
