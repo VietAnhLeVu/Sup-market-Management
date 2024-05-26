@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -24,6 +25,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -200,6 +202,73 @@ public class adminDashboardController implements Initializable {
         }
     }
 
+    public void dashboardIncomeToday() {
+        Date date = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        String sql = "Select SUM(price) from purchasedata where date='"+sqlDate+"'";
+
+        double sumT =0 ;
+
+        connect  = SQLconnect.connectTodb();
+
+        try{
+            statement = connect.createStatement();
+            result = statement.executeQuery(sql);
+
+            if(result.next()) {
+                sumT += result.getDouble("SUM(price)");
+            }
+
+            dashboard_todayIncome.setText("$"+String.valueOf(sumT));
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void dashboardIncomeTotal() {
+        String sql = "Select SUM(price) from purchasedata ";
+
+        double sumT =0 ;
+
+        connect  = SQLconnect.connectTodb();
+
+        try{
+            statement = connect.createStatement();
+            result = statement.executeQuery(sql);
+
+            if(result.next()) {
+                sumT += result.getDouble("SUM(price)");
+            }
+
+            dashboard_totalIncome.setText("$"+String.valueOf(sumT));
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void dashboardChart() {
+        dashboard_chart.getData().clear();
+        String sql = "Select date, SUM(price) FROM purchasedata GROUP BY date ORDER BY TIMESTAMP(date)ASC LIMIT 9";
+
+        connect = SQLconnect.connectTodb();
+
+        try{
+
+            XYChart.Series chart = new XYChart.Series();
+
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+                chart.getData().add(new XYChart.Data(result.getString(1),result.getDouble(2)));
+            }
+
+            dashboard_chart.getData().add(chart);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void addProductsAdd() {
         String insertProduct = "INSERT INTO products " +
                 "(productCode,productLine,productName,quantityInStock,buyPrice) " +
@@ -725,6 +794,11 @@ public class adminDashboardController implements Initializable {
             dashboard_btn.setStyle("-fx-background-color:linear-gradient(to right, #5c4dcc,#3521cc)");
             addProducts_btn.setStyle("-fx-background-color:transparent");
             employees_btn.setStyle("-fx-background-color:transparent");
+
+            dashboardDisplayActiveEmployees();
+            dashboardIncomeToday();
+            dashboardIncomeTotal();
+            dashboardChart();
         } else if (event.getSource() == addProducts_btn) {
             addProducts_form.setVisible(true);
             dashboard_form.setVisible(false);
@@ -766,6 +840,9 @@ public class adminDashboardController implements Initializable {
         employeesShowListData();
 
         dashboardDisplayActiveEmployees();
+        dashboardIncomeToday();
+        dashboardIncomeTotal();
+        dashboardChart();
     }
 
 }
