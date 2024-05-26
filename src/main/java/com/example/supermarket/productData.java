@@ -1,13 +1,13 @@
 package com.example.supermarket;
 
 public class productData {
-    private String productID;
-    private String brand;
-    private String productName;
-    private Integer quantity;
-    private Double price;
+    private final String productID;
+    private final String brand;
+    private final String productName;
+    private final Integer quantity;
+    private final Double price;
 
-    public productData(String productID,String brand,String productName,Integer quantity,Double price) {
+    public productData(String productID, String brand, String productName, Integer quantity, Double price) {
         this.productID = productID;
         this.brand = brand;
         this.productName = productName;

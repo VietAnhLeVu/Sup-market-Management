@@ -178,7 +178,8 @@ public class adminDashboardController implements Initializable {
     private PreparedStatement prepare;
     private Statement statement;
     private ResultSet result;
-
+    private ObservableList<productData> addProductsList;
+    private ObservableList<employeeData> employeesList;
 
     public void dashboardDisplayActiveEmployees() {
         String sql = "SELECT COUNT(employeeNumber) from employees";
@@ -190,14 +191,15 @@ public class adminDashboardController implements Initializable {
             statement = connect.createStatement();
             result = statement.executeQuery(sql);
 
-            if(result.next()) {
+            if (result.next()) {
                 countE = result.getInt("COUNT(employeeNumber)");
                 dashboard_activeEmployees.setText(String.valueOf(countE));
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public void addProductsAdd() {
         String insertProduct = "INSERT INTO products " +
                 "(productCode,productLine,productName,quantityInStock,buyPrice) " +
@@ -300,7 +302,6 @@ public class adminDashboardController implements Initializable {
                     addProductsShowData();
                     addProductsClear();
                 } else {
-                    return;
                 }
             }
         } catch (Exception e) {
@@ -352,7 +353,6 @@ public class adminDashboardController implements Initializable {
                     addProductsClear();
                     addProductsShowData();
                 } else {
-                    return;
                 }
             }
         } catch (Exception e) {
@@ -363,7 +363,7 @@ public class adminDashboardController implements Initializable {
     public void addProductsSearch() {
 
 
-        FilteredList<productData> filter = new FilteredList<>(addProductsList,e->true);
+        FilteredList<productData> filter = new FilteredList<>(addProductsList, e -> true);
 
         addProducts_search.textProperty().addListener((Observable, oldValue, newValue) -> {
 //            System.out.println("Search text changed to: " + newValue);
@@ -379,20 +379,15 @@ public class adminDashboardController implements Initializable {
 
                 if (predicateProductData.getProductID().toLowerCase().contains(searchKey)) {
                     return true;
-                }else if(predicateProductData.getBrand().toLowerCase().contains(searchKey)) {
+                } else if (predicateProductData.getBrand().toLowerCase().contains(searchKey)) {
                     return true;
-                }else if(predicateProductData.getProductName().toLowerCase().contains(searchKey)) {
+                } else if (predicateProductData.getProductName().toLowerCase().contains(searchKey)) {
                     return true;
-                }else if(predicateProductData.getQuantity().toString().contains(searchKey)) {
+                } else if (predicateProductData.getQuantity().toString().contains(searchKey)) {
                     return true;
-                }else if(predicateProductData.getPrice().toString().contains(searchKey)) {
-                    return true;
-                }else {
-                    return false;
-                }
+                } else return predicateProductData.getPrice().toString().contains(searchKey);
             });
         });
-
 
 
         SortedList<productData> sortedList = new SortedList<>(filter);
@@ -445,8 +440,6 @@ public class adminDashboardController implements Initializable {
         return prodList;
     }
 
-    private ObservableList<productData> addProductsList;
-
     public void addProductsShowData() {
         addProductsList = addProductsListData();
 
@@ -458,7 +451,6 @@ public class adminDashboardController implements Initializable {
 
         addProducts_tableView.setItems(addProductsList);
     }
-
 
     public ObservableList<employeeData> employeesListData() {
 
@@ -475,7 +467,7 @@ public class adminDashboardController implements Initializable {
             result = prepare.executeQuery();
 
             while (result.next()) {
-                employeeD =  new employeeData(result.getString("employeeNumber"),
+                employeeD = new employeeData(result.getString("employeeNumber"),
                         result.getString("password"),
                         result.getString("firstName"),
                         result.getString("lastName"),
@@ -485,13 +477,12 @@ public class adminDashboardController implements Initializable {
                 emData.add(employeeD);
             }
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return emData;
     }
 
-    private ObservableList<employeeData> employeesList;
     public void employeesShowListData() {
         employeesList = employeesListData();
 
@@ -509,7 +500,7 @@ public class adminDashboardController implements Initializable {
         employeeData employeeD = employees_tableView.getSelectionModel().getSelectedItem();
         int num = employees_tableView.getSelectionModel().getSelectedIndex();
 
-        if(num-1 < -1) {
+        if (num - 1 < -1) {
             return;
         }
 
@@ -529,29 +520,29 @@ public class adminDashboardController implements Initializable {
         try {
 
             Alert alert;
-            if(employees_EmployeesID.getText().isEmpty() ||
-                    employees_Lastname.getText().isEmpty()||
-                    employees_Firstname.getText().isEmpty()||
-                    employees_Password.getText().isEmpty()||
-                    employees_Email.getText().isEmpty()||
+            if (employees_EmployeesID.getText().isEmpty() ||
+                    employees_Lastname.getText().isEmpty() ||
+                    employees_Firstname.getText().isEmpty() ||
+                    employees_Password.getText().isEmpty() ||
+                    employees_Email.getText().isEmpty() ||
                     employees_jobTitle.getText().isEmpty()) {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error message");
                 alert.setHeaderText(null);
                 alert.setContentText("Please fill all the blank field!");
                 alert.showAndWait();
-            }else {
+            } else {
 
                 String checkExist = "SElECT employeeNumber from employees" +
-                        " WHERE employeeNumber = '"+employees_EmployeesID.getText()+"'";
+                        " WHERE employeeNumber = '" + employees_EmployeesID.getText() + "'";
 
                 statement = connect.createStatement();
                 result = statement.executeQuery(checkExist);
-                if(result.next()) {
+                if (result.next()) {
                     alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error message");
                     alert.setHeaderText(null);
-                    alert.setContentText("Employee with ID : '"+employees_EmployeesID.getText()+"' has already existed!");
+                    alert.setContentText("Employee with ID : '" + employees_EmployeesID.getText() + "' has already existed!");
                     alert.showAndWait();
                 }
                 prepare = connect.prepareStatement(insertEmployee);
@@ -573,41 +564,41 @@ public class adminDashboardController implements Initializable {
                 employeesShowListData();
                 employeeReset();
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
     public void employeeUpdate() {
-        String employeeUpdate = "Update employees SET lastName = '"+employees_Lastname.getText()+"'" +
-                ",firstName = '"+employees_Firstname.getText()+"'" +
-                ",password = '"+employees_Password.getText()+"'" +
-                ",email = '"+employees_Email.getText()+"'" +
-                ",jobTitle = '"+employees_jobTitle.getText()+"'" +
-                "WHERE employeeNumber = '"+employees_EmployeesID.getText()+"'";
+        String employeeUpdate = "Update employees SET lastName = '" + employees_Lastname.getText() + "'" +
+                ",firstName = '" + employees_Firstname.getText() + "'" +
+                ",password = '" + employees_Password.getText() + "'" +
+                ",email = '" + employees_Email.getText() + "'" +
+                ",jobTitle = '" + employees_jobTitle.getText() + "'" +
+                "WHERE employeeNumber = '" + employees_EmployeesID.getText() + "'";
 
         connect = SQLconnect.connectTodb();
-        try{
+        try {
             Alert alert;
-            if(employees_EmployeesID.getText().isEmpty() ||
-                    employees_Lastname.getText().isEmpty()||
-                    employees_Firstname.getText().isEmpty()||
-                    employees_Password.getText().isEmpty()||
-                    employees_Email.getText().isEmpty()||
+            if (employees_EmployeesID.getText().isEmpty() ||
+                    employees_Lastname.getText().isEmpty() ||
+                    employees_Firstname.getText().isEmpty() ||
+                    employees_Password.getText().isEmpty() ||
+                    employees_Email.getText().isEmpty() ||
                     employees_jobTitle.getText().isEmpty()) {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error message");
                 alert.setHeaderText(null);
                 alert.setContentText("Please fill all the blank field!");
                 alert.showAndWait();
-            }else {
+            } else {
                 alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Confirmation message");
                 alert.setHeaderText(null);
-                alert.setContentText("Are you sure you want to update employee ID : '"+employees_EmployeesID.getText()+"'");
-                Optional<ButtonType> optional  = alert.showAndWait();
-                if(optional.get().equals(ButtonType.OK)) {
+                alert.setContentText("Are you sure you want to update employee ID : '" + employees_EmployeesID.getText() + "'");
+                Optional<ButtonType> optional = alert.showAndWait();
+                if (optional.get().equals(ButtonType.OK)) {
                     statement = connect.createStatement();
                     statement.executeUpdate(employeeUpdate);
 
@@ -619,42 +610,41 @@ public class adminDashboardController implements Initializable {
 
                     employeesShowListData();
                     employeeReset();
-                }else {
-                    return;
+                } else {
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void employeesDelete() {
-        String deleteEmployee =  "DELETE FROM employees" +
-                " WHERE employeeNumber = '"+employees_EmployeesID.getText()+"'";
+        String deleteEmployee = "DELETE FROM employees" +
+                " WHERE employeeNumber = '" + employees_EmployeesID.getText() + "'";
 
         connect = SQLconnect.connectTodb();
 
-        try{
+        try {
             Alert alert;
-            if(employees_EmployeesID.getText().isEmpty() ||
-                    employees_Lastname.getText().isEmpty()||
-                    employees_Firstname.getText().isEmpty()||
-                    employees_Password.getText().isEmpty()||
-                    employees_Email.getText().isEmpty()||
+            if (employees_EmployeesID.getText().isEmpty() ||
+                    employees_Lastname.getText().isEmpty() ||
+                    employees_Firstname.getText().isEmpty() ||
+                    employees_Password.getText().isEmpty() ||
+                    employees_Email.getText().isEmpty() ||
                     employees_jobTitle.getText().isEmpty()) {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error message");
                 alert.setHeaderText(null);
                 alert.setContentText("Please fill all the blank field!");
                 alert.showAndWait();
-            }else {
+            } else {
                 alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Confirmation message");
                 alert.setHeaderText(null);
-                alert.setContentText("Are you sure you want to delete employee ID : '"+employees_EmployeesID.getText()+"'");
-                Optional<ButtonType> optional  = alert.showAndWait();
+                alert.setContentText("Are you sure you want to delete employee ID : '" + employees_EmployeesID.getText() + "'");
+                Optional<ButtonType> optional = alert.showAndWait();
 
-                if(optional.get().equals(ButtonType.OK)) {
+                if (optional.get().equals(ButtonType.OK)) {
                     statement = connect.createStatement();
                     statement.executeUpdate(deleteEmployee);
 
@@ -666,14 +656,14 @@ public class adminDashboardController implements Initializable {
 
                     employeesShowListData();
                     employeeReset();
-                }else {
-                    return;
+                } else {
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public void employeeReset() {
         employees_EmployeesID.setText("");
         employees_Password.setText("");
@@ -682,6 +672,7 @@ public class adminDashboardController implements Initializable {
         employees_Email.setText("");
         employees_jobTitle.setText("");
     }
+
     public void logout() {
         try {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
