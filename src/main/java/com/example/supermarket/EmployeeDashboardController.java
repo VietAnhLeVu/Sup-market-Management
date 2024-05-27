@@ -45,16 +45,13 @@ public class EmployeeDashboardController {
     private ComboBox<String> purchase_brand;
 
     @FXML
-    private Button purchase_payBtn;
+    private Button purchase_submitBtn;
 
     @FXML
     private ComboBox<String> purchase_productName;
 
     @FXML
     private Spinner<Integer> purchase_quantity;
-
-    @FXML
-    private Button purchase_receiptBtn;
 
     @FXML
     private TableView<PurchaseData> purchase_tableView;
@@ -76,6 +73,7 @@ public class EmployeeDashboardController {
         initPurchaseQuantitySpinner();
         setPurchase_addBtn();
         setPurchase_clearBtn();
+        setPurchase_submitBtn();
         setTotalValue();
     }
 
@@ -88,7 +86,6 @@ public class EmployeeDashboardController {
     }
 
     public void setEmployeeId(String employeeId) {
-        //TODO: set employee id text.
         employee_id.setText(employeeId);
         employee_id.setStyle("-fx-center:true");
         employee_id.setMaxWidth(Double.MAX_VALUE);
@@ -120,7 +117,7 @@ public class EmployeeDashboardController {
             if (option.get().equals(ButtonType.OK)) {
                 ((Stage) logout.getScene().getWindow()).setScene(
                         new Scene(FXMLLoader.load(getClass().getResource("LoginDashboard.fxml")
-                        )));
+                )));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,16 +167,20 @@ public class EmployeeDashboardController {
         purchase_addBtn.setOnAction(actionEvent -> {
             //update purchase list and table
             if (!verifyCustomerId()) {
-                alert(Alert.AlertType.ERROR, "Error message", null, "Customer ID must be integer");
+                AlertBox alertBox = new AlertBox(Alert.AlertType.ERROR, "Error message", null, "Customer ID must be integer");
+                alertBox.showAlert();
                 return;
             } else if (purchase_brand.getValue() == null) {
-                alert(Alert.AlertType.ERROR, "Error message", null, "Brand Name must not be blank");
+                AlertBox alertBox = new AlertBox(Alert.AlertType.ERROR, "Error message", null, "Brand Name must not be blank");
+                alertBox.showAlert();
                 return;
             } else if (purchase_productName.getValue() == null) {
-                alert(Alert.AlertType.ERROR, "Error message", null, "Product Name must not be blank");
+                AlertBox alertBox = new AlertBox(Alert.AlertType.ERROR, "Error message", null, "Product Name must not be blank");
+                alertBox.showAlert();
                 return;
             } else if (purchase_quantity.getValue() < 1) {
-                alert(Alert.AlertType.ERROR, "Error message", null, "Quantity must be >0");
+                AlertBox alertBox = new AlertBox(Alert.AlertType.ERROR, "Error message", null, "Quantity must be >0");
+                alertBox.showAlert();
                 return;
             }
 
@@ -197,19 +198,8 @@ public class EmployeeDashboardController {
 
             //update total
             double currentTotal = Double.parseDouble(purchase_total.getText().substring(1));
-            purchase_total.setText("$" + (currentTotal + productPrice * purchase_quantity.getValue()));
-
-            //update sql table
-            insertPurchaseDataSQL(purchaseData);
+            purchase_total.setText("$" + String.format("%.2f", (currentTotal + productPrice * purchase_quantity.getValue())));
         });
-    }
-
-    private void alert(Alert.AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     private boolean verifyCustomerId() {
@@ -221,7 +211,15 @@ public class EmployeeDashboardController {
             purchaseList.clear();
             purchase_tableView.setItems(purchaseList);
             purchase_total.setText("$0.0");
-            clearPurchaseDataSQL();
+        });
+    }
+
+    public void setPurchase_submitBtn() {
+        //update sql table
+        purchase_submitBtn.setOnAction(actionEvent -> {
+            insertPurchaseDataSQL(purchaseList);
+            AlertBox alertBox = new AlertBox(Alert.AlertType.INFORMATION, "Information message", null, "Successfully submitted order(s)!");
+            alertBox.showAlert();
         });
     }
 }
