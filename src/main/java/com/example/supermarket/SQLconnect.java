@@ -17,7 +17,7 @@ public class SQLconnect {
             );
 
             Statement use = connect.createStatement();
-            use.execute("USE quan_ly_ban_hang");
+            use.execute("USE classicmodels");
 
         } catch (SQLException e) {
             e.printStackTrace();
