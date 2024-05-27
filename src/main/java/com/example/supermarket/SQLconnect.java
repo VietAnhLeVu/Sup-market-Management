@@ -1,7 +1,9 @@
 package com.example.supermarket;
 
-import java.net.ConnectException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SQLconnect {
 
@@ -17,7 +19,7 @@ public class SQLconnect {
             Statement use = connect.createStatement();
             use.execute("USE classicmodels");
 
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return connect;

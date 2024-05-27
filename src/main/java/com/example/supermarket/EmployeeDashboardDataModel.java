@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class EmployeeDashboardDataModel {
     static Connection connection = SQLconnect.connectTodb();
@@ -81,25 +82,21 @@ public class EmployeeDashboardDataModel {
         }
     }
 
-    public static void insertPurchaseDataSQL(PurchaseData purchaseData) {
-        String sql = "INSERT INTO purchaseData \n" +
-                "VALUES(" + purchaseData.getCustomerId() +
-                ", '" + purchaseData.getBrand() + "'" +
-                ", '" + purchaseData.getProductName() + "'" +
-                ", " + purchaseData.getQuantity() +
-                ", " + purchaseData.getPrice() +
-                ", '" + purchaseData.getDate() + "');";
-        try {
-            connection.prepareStatement(sql).executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public static void insertPurchaseDataSQL(ObservableList<PurchaseData> purchaseList) {
+        StringBuilder sql = new StringBuilder("INSERT INTO purchaseData VALUES\n");
+        for (PurchaseData purchaseData : purchaseList) {
+             sql.append("(" + purchaseData.getCustomerId() +
+                    ", '" + purchaseData.getBrand() + "'" +
+                    ", '" + purchaseData.getProductName() + "'" +
+                    ", " + purchaseData.getQuantity() +
+                    ", " + purchaseData.getPrice() +
+                    ", '" + purchaseData.getDate() + "'),\n");
         }
-    }
-
-    public static void clearPurchaseDataSQL() {
+        sql.setCharAt(sql.length()-2, ';');
         try {
-            connection.createStatement().execute("DELETE FROM purchaseData;");
-        } catch (SQLException e) {
+            System.out.println(sql.toString());
+            connection.prepareStatement(sql.toString()).executeUpdate();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
